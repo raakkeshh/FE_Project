@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Event Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <section id="login-page" class="login-section">
+        <div class="portal-container">
+            <h1>Campus <span style="color:var(--accent-yellow)">KL Sportz & Events</span></h1>
+            <p>Select your portal to continue</p>
+            
+            <div class="portal-choices">
+                <div class="portal-card" onclick="showLoginForm('student')">
+                    <div class="icon-wrapper"><i class="fas fa-user-graduate"></i></div>
+                    <h3>Student Portal</h3>
+                    <p>Register for events & track progress</p>
+                </div>
+
+                <div class="portal-card admin" onclick="showLoginForm('admin')">
+                    <div class="icon-wrapper"><i class="fas fa-user-shield"></i></div>
+                    <h3>Admin Portal</h3>
+                    <p>Manage events & view analytics</p>
+                </div>
+            </div>
+
+            <div id="actualLoginForm" class="hidden">
+                <h3 id="portalTitle" style="margin-bottom:15px; color:white;">Login</h3>
+                <form onsubmit="handleLogin(event)">
+                    <input type="hidden" id="selectedRole">
+                    <input type="text" id="username" placeholder="Username" required value="Alex">
+                    <input type="password" placeholder="Password" required value="1234">
+                    <button type="submit" class="btn-neon">Enter Portal</button>
+                    <p class="back-link" onclick="resetLogin()">Back to selection</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div id="app-container" class="app-layout hidden">
+        
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <i class="fas fa-layer-group"></i> KL Sportz & Events
+                </div>
+                <i class="fas fa-times close-sidebar" onclick="toggleSidebar()"></i>
+            </div>
+
+            <ul id="adminMenu" class="menu-list hidden">
+                <li onclick="navTo('admin-dashboard', this)" class="active">
+                    <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
+                </li>
+                <li onclick="navTo('admin-events', this)">
+                    <i class="fas fa-calendar-plus"></i> <span>Manage Events</span>
+                </li>
+                <li onclick="navTo('admin-participation', this)">
+                    <i class="fas fa-users"></i> <span>Student Leaderboard</span>
+                </li>
+            </ul>
+
+            <ul id="studentMenu" class="menu-list hidden">
+                <li onclick="navTo('student-dashboard', this)" class="active">
+                    <i class="fas fa-home"></i> <span>Home</span>
+                </li>
+                <li onclick="navTo('student-events', this)">
+                    <i class="fas fa-compass"></i> <span>Explore Events</span>
+                </li>
+                <li onclick="navTo('student-activities', this)">
+                    <i class="fas fa-dumbbell"></i> <span>My Activities</span>
+                </li>
+            </ul>
+
+            <div class="logout-section" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </div>
+        </nav>
+
+        <main class="content">
+            <header>
+                <div class="header-left">
+                    <button class="menu-btn" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2>Welcome, <span id="displayUser" style="color:var(--accent-yellow)">User</span></h2>
+                </div>
+                <div class="header-right">
+                    <span class="role-badge" id="displayRole">Student</span>
+                </div>
+            </header>
+
+            <section id="admin-dashboard" class="section hidden">
+                <h2 class="page-title">Admin Dashboard</h2>
+                
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <h3>Total Events</h3>
+                        <p id="admEventCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Students</h3>
+                        <p>1,204</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg. Participation</h3>
+                        <p>85%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Feedback Score</h3>
+                        <p>4.8</p>
+                    </div>
+                </div>
+
+                <div class="chart-box">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </section>
+
+            <section id="admin-events" class="section hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 class="page-title">Manage Events</h2>
+                    <button class="btn-neon" style="width:auto; padding:10px 20px;" onclick="toggleEventForm()">
+                        <i class="fas fa-plus"></i> Add New Event
+                    </button>
+                </div>
+
+                <div id="eventFormContainer" class="admin-form-container hidden">
+                    <div class="form-header">
+                        <h3>Create New Event</h3>
+                        <i class="fas fa-times" style="cursor:pointer" onclick="toggleEventForm()"></i>
+                    </div>
+                    <form onsubmit="addNewEvent(event)">
+                        <div class="form-group">
+                            <label>Event Title</label>
+                            <input type="text" id="newEventTitle" placeholder="Ex: Coding Hackathon 2025" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="newEventCategory">
+                                    <option value="Tech">Technology</option>
+                                    <option value="Sports">Sports</option>
+                                    <option value="Cultural">Cultural</option>
+                                    <option value="Workshop">Workshop</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" id="newEventDate" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Event Image URL (Optional)</label>
+                            <input type="text" id="newEventImg" placeholder="https://...">
+                        </div>
+
+                        <button class="btn-neon">Publish Event</button>
+                    </form>
+                </div>
+
+                <h3 style="margin: 30px 0 20px 0; border-bottom:1px solid #333; padding-bottom:10px;">Current Events List</h3>
+                <div id="adminEventGrid" class="event-grid"></div>
+            </section>
+
+            <section id="admin-participation" class="section hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 class="page-title">Student Participation Leaderboard</h2>
+                    <button class="btn-neon" style="width:auto; padding:8px 20px;" onclick="alert('Exporting to CSV...')"><i class="fas fa-download"></i> Export CSV</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student Name</th>
+                                <th>Year/Branch</th>
+                                <th>Events Joined</th>
+                                <th>Total Points</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="student-dashboard" class="section hidden">
+                <h2 class="page-title">Student Dashboard</h2>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <h3>Registered</h3>
+                        <p id="stRegCount">0</p>
+                    </div>
+                    <div class="stat-card" style="border-color: var(--accent-yellow);">
+                        <h3>My Points</h3>
+                        <p id="stPoints" style="color: var(--accent-yellow);">0</p>
+                    </div>
+                </div>
+                <h3 style="margin-top:20px">Recommended for You</h3>
+                <div id="studentSuggestionGrid" class="event-grid"></div>
+            </section>
+
+            <section id="student-events" class="section hidden">
+                <div class="explore-header">
+                    <h2 class="page-title">Explore Events</h2>
+                    <div class="filter-list">
+                        <button class="filter-btn active" onclick="filterEvents('All', this)">All</button>
+                        <button class="filter-btn" onclick="filterEvents('Tech', this)">Tech</button>
+                        <button class="filter-btn" onclick="filterEvents('Sports', this)">Sports</button>
+                        <button class="filter-btn" onclick="filterEvents('Cultural', this)">Cultural</button>
+                    </div>
+                </div>
+                <div id="studentEventGrid" class="event-grid"></div>
+            </section>
+
+            <section id="student-activities" class="section hidden">
+                <h2 class="page-title">My Schedule</h2>
+                <div id="myActivitiesGrid" class="event-grid"></div>
+            </section>
+
+        </main>
+        
+        <div id="overlay" class="overlay"></div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
