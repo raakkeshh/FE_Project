@@ -233,6 +233,34 @@ function showToast(msg) {
     document.getElementById('toast-container').appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
 }
+function exportCSV() {
+  // Sample data (replace with your real data)
+  const data = [
+    { rank: 1, name: "Sarah Jenkins", branch: "CSE - 3rd Year", events: 15, points: 750 },
+    { rank: 2, name: "Mike Ross", branch: "ECE - 4th Year", events: 12, points: 600 },
+    { rank: 3, name: "Jessica Pearson", branch: "MBA - 1st Year", events: 10, points: 500 },
+    { rank: 4, name: "Harvey Specter", branch: "Law - 2nd Year", events: 9, points: 450 },
+    { rank: 5, name: "Louis Litt", branch: "Finance - 3rd Year", events: 8, points: 400 }
+];
+
+  // Convert array to CSV
+  let csvContent = "";
+  data.forEach(row => {
+    csvContent += row.join(",") + "\n";
+  });
+
+  // Create file and download
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "export.csv";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 
 function initChart() {
     const ctx = document.getElementById('mainChart');
@@ -262,3 +290,4 @@ function initChart() {
     }
 
 }
+
