@@ -23,7 +23,7 @@ Design: Fully responsive layout using CSS Grid and Flexbox, featuring a collapsi
 We really enjoyed working on the logic for the leaderboard and the dynamic event filtering. It was a great exercise in DOM manipulation and state management!
 
 Check out the screenshots below. 
-Web application link: https://lnkd.in/gq-3ZNEm
+Web application link: https://lnkd.in/gBfAmc5R
 Let us know what you think of the UI! 
 
 Great work team! 
